@@ -4,21 +4,26 @@ import shutil
 import subprocess
 import time
 from typing import Any
-
 from agents import Agent, Runner, gen_trace_id, trace
 from agents.mcp import MCPServer, MCPServerSse
 from agents.model_settings import ModelSettings
 
 
 async def run(mcp_server: MCPServer):
-    agent = Agent(
-        name="Assistant",
-        instructions="Use the tools to extract an address from a web page and then geocode it to get coordinates.",
+    crawler_agent = Agent(
+        name="Crawler",
+        instructions="Use the tools to extract an address from a web page",
+        mcp_servers=[mcp_server],
+        model_settings=ModelSettings(tool_choice="required"),
+    )
+    geocoder_agent = Agent(
+        name="Geocoder",
+        instructions="Use the tools to geocode an address",
         mcp_servers=[mcp_server],
         model_settings=ModelSettings(tool_choice="required"),
     )
 
-    # First test with a simple example to confirm the agent is working
+
     message = "Extract the address from this URL: https://www.openstreetmap.org/about and geocode it"
     print(f"Running: {message}")
     result = await Runner.run(starting_agent=agent, input=message)

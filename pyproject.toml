@@ -3,22 +3,18 @@ name = "agents"
 version = "0.1.0"
 description = ""
 authors = [
-    {name = "brightertiger"}
+    {name = "brightertiger",email = "ujjwalsrao@gmail.com"}
 ]
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "fastmcp (>=0.4.1,<0.5.0)",
-    "smolagents[mcp] (>=1.13.0,<2.0.0)",
+    "mcp (>=1.6.0,<2.0.0)",
     "google-adk (>=0.1.0,<0.2.0)",
     "openai-agents (>=0.0.9,<0.0.10)",
-    "markdownify (>=1.1.0,<2.0.0)"
+    "beautifulsoup4 (>=4.13.3,<5.0.0)"
 ]
 
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
-
-[[tool.poetry.packages]]
-include = "agents"
