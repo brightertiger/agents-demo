@@ -5,7 +5,7 @@
             "name": "Python",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/src/google_agents/fetch_address.py",
+            "program": "${workspaceFolder}/src/agents/agent.py",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}"
         }
