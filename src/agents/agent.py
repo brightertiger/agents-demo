@@ -25,8 +25,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-MODEL_GEMINI_2_0_FLASH = "gemini-2.0-flash"
-MODEL_GEMINI_2_5_PRO = "gemini-2.5-pro-preview-03-25"
+MODEL = "gemini/gemini-2.0-flash"
 APP_NAME = "adk_agent"
 
 
@@ -45,7 +44,9 @@ async def get_tools_async(path_to_mcp_server: str):
 async def get_specialist_agent(config: dict, tools: list):
     agent = Agent(
         model=LiteLlm(
-            model=MODEL_GEMINI_2_0_FLASH, api_key=os.getenv("GOOGLE_API_KEY")
+            model=MODEL,
+            api_key=os.getenv("GOOGLE_API_KEY"),
+            temperature=0.1,  # More deterministic output
         ),
         name=config["name"],
         description=config["description"],
@@ -66,7 +67,9 @@ async def get_manager_agent(config: dict, tools: list):
 
     manager_agent = Agent(
         model=LiteLlm(
-            model=MODEL_GEMINI_2_0_FLASH, api_key=os.getenv("GOOGLE_API_KEY")
+            model=MODEL,
+            api_key=os.getenv("GOOGLE_API_KEY"),
+            temperature=0.1,  # More deterministic output
         ),
         name="manager_agent",
         description=config["manager_agent"]["description"],

@@ -1,1 +1,37 @@
-""
+[
+    {
+        "address": "Google Hyderabad Office, DivyaSree Omega, Survey No. 13, Kondapur Village",
+        "city": "Hyderabad",
+        "state": "Telangana",
+        "zip": "500084",
+        "country": "India"
+    },
+    {
+        "address": "Google Bangalore Office, No. 3, RMZ Infinity \u2013 Tower E, Old Madras Road, 4th and 5th Floors",
+        "city": "Bangalore",
+        "state": "Karnataka",
+        "zip": "560016",
+        "country": "India"
+    },
+    {
+        "address": "Google Mumbai Office, 1st Floor, 3 North Avenue, Maker Maxity, Bandra Kurla Complex, Bandra East",
+        "city": "Mumbai",
+        "state": "Maharashtra",
+        "zip": "400051",
+        "country": "India"
+    },
+    {
+        "address": "Google Gurgaon Office, Signature Tower-II, Tower-B, South City 1, NH-8",
+        "city": "Gurgaon",
+        "state": "Haryana",
+        "zip": "122001",
+        "country": "India"
+    },
+    {
+        "address": "1016, Gera Imperium Alpha, Rajaram Patil Nagar, Vitthal Nagar, Kharadi",
+        "city": "Pune",
+        "state": "Maharashtra",
+        "zip": "411014",
+        "country": "India"
+    }
+]

@@ -2,6 +2,7 @@ import requests
 import json
 from bs4 import BeautifulSoup
 from mcp.server.fastmcp import FastMCP
+from pydantic import BaseModel, Field
 
 mcp = FastMCP("Web Tool Server")
 
@@ -26,18 +27,18 @@ def crawl_to_markdown(url: str) -> str:
 
 @mcp.tool(
     name="geocode_address",
-    description="Geocode an address to get the latitude and longitude",
+    description="Convert an address to geographic coordinates using OpenStreetMap",
 )
 def geocode_address(address: dict) -> dict:
-    """Geocode an address to get the latitude and longitude"""
+    """Convert an address to geographic coordinates"""
     endpoint = "https://nominatim.openstreetmap.org/search"
     if isinstance(address, str):
         address = json.loads(address)
-    address_string = f"{address.get('address',"")}, "
-    address_string += f"{address.get('city',"")}, "
-    address_string += f"{address.get('state',"")}, "
-    address_string += f"{address.get('zip',"")}, "
-    address_string += f"{address.get('country',"")}"
+    address_string = f"{address.get('address', '')}, "
+    address_string += f"{address.get('city', '')}, "
+    address_string += f"{address.get('state', '')}, "
+    address_string += f"{address.get('zip', '')}, "
+    address_string += f"{address.get('country', '')}"
     params = {"q": address_string, "format": "json", "limit": 1}
     headers = {"User-Agent": "MCP-GeocodingService/1.0"}  # Required by Nominatim
     response = requests.get(endpoint, params=params, headers=headers)
@@ -53,5 +54,4 @@ def geocode_address(address: dict) -> dict:
 
 
 if __name__ == "__main__":
-    # mcp.run(transport="sse")
     mcp.run(transport="stdio")
