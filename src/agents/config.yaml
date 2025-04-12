@@ -14,11 +14,17 @@ crawler_agent:
     Example usage:
     Input: "https://example.com"
     Tool call: crawl_to_markdown(url="https://example.com")
+
+    Example output:
+    {
+      "page_content": "This is the cleaned text content of the webpage."
+    }
     """
   description: >
     """
     You are a web crawler agent that fetches and cleans webpage content.
     """
+  output_key: "page_content"
 
 address_agent:
   name: "address_agent"
@@ -38,18 +44,22 @@ address_agent:
     - country: Country name
     
     Example output:
-    [{
-      "address": "123 Main St",
-      "city": "Anytown",
-      "state": "CA",
-      "zip": "12345",
-      "country": "USA"
-    }]
+    {
+      "addresses": [{
+        "address": "123 Main St",
+        "city": "Anytown",
+        "state": "CA",
+        "zip": "12345",
+        "country": "USA"
+      }]
+    }
     """
   description: >
     """
     You are an address extraction agent that identifies and formats addresses from text.
+    You will be given a text string and you will extract the addresses.
     """
+  output_key: "addresses"
 
 geocoding_agent:
   name: "geocoding_agent"
@@ -76,12 +86,32 @@ geocoding_agent:
       "zip": "12345",
       "country": "USA"
     }
-    Tool call: geocode_address(address={"address": "123 Main St", "city": "Anytown", "state": "CA", "zip": "12345", "country": "USA"})
+    Output: 
+    Tool call: geocode_address(addresses={
+      "addresses": [
+        {"address": "123 Main St", "city": "Anytown", "state": "CA", "zip": "12345", "country": "USA"}
+      ]
+    })
+    
+    Example output:
+    {
+      "geocoded_locations": [{
+        "address": "123 Main St",
+        "city": "Anytown",
+        "state": "CA",
+        "zip": "12345",
+        "country": "USA",
+        "latitude": 37.774929,
+        "longitude": -122.419416
+      }]
+    }
     """
   description: >
     """
-    You are a geocoding agent that converts addresses to geographic coordinates.
+    You are a geocoding agent that converts addresses to geographic coordinates. 
+    You will be given an address object and you will need to use the geocode_address tool to get the coordinates.
     """
+  output_key: "geocoded_locations"
 
 manager_agent:
   name: "manager_agent"
@@ -97,28 +127,42 @@ manager_agent:
     Each object in the output array must have:
     - url: The original URL
     - address: The extracted address object
-    - geocoded_location: The coordinates object with latitude and longitude
+    - city: The city name
+    - state: The state name
+    - zip: The postal code
+    - country: The country name
+    - latitude: The latitude coordinate
+    - longitude: The longitude coordinate
     
     Example output:
-    [{
-      "url": "https://example.com",
-      "address": {
+    [
+      {
+        "url": "https://example.com",
         "address": "123 Main St",
         "city": "Anytown",
         "state": "CA",
         "zip": "12345",
-        "country": "USA"
-      },
-      "geocoded_location": {
-        "latitude": 37.774929,
-        "longitude": -122.419416
-      }
-    }]
+        "country": "USA",
+        "latitude": "37.774929",
+        "longitude": "-122.419416"
+        }
+    ]
     """
   description: >
     """
     You are the main coordinator agent that extracts and geocodes addresses from webpages.
+    You will be given a URL and you will need to extract the addresses and their corresponding geocoded locations.
+    You will use the crawler_agent to fetch the webpage content and the address_agent to extract the addresses.
+    You will then use the geocoding_agent to get the coordinates for each address.
     """
+
+sequential_agent:
+  name: "sequential_agent"
+  description: >
+    """
+    You are the main coordinator agent that extracts and geocodes addresses from webpages.
+    """
+
 
 query: >
   """

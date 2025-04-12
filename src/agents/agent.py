@@ -4,9 +4,10 @@ import yaml
 import logging
 import asyncio
 import uuid
+import litellm
 from json_repair import repair_json
 from dotenv import load_dotenv
-from google.adk.agents import Agent
+from google.adk.agents import Agent, SequentialAgent
 from google.adk.models.lite_llm import LiteLlm
 from google.adk.sessions import InMemorySessionService
 from google.adk.runners import Runner
@@ -17,7 +18,7 @@ from google.adk.tools.mcp_tool.mcp_toolset import (
     StdioServerParameters,
 )
 
-# Configure logging
+litellm.suppress_debug_info = True
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -33,7 +34,7 @@ async def get_tools_async(path_to_mcp_server: str):
     logger.info("Attempting to connect to MCP Filesystem server...")
     tools, exit_stack = await MCPToolset.from_server(
         connection_params=StdioServerParameters(
-            command="python",  # Command to run the server
+            command="python",
             args=[path_to_mcp_server],
         )
     )
@@ -46,30 +47,31 @@ async def get_specialist_agent(config: dict, tools: list):
         model=LiteLlm(
             model=MODEL,
             api_key=os.getenv("GOOGLE_API_KEY"),
-            temperature=0.1,  # More deterministic output
+            generate_content_config=types.GenerateContentConfig(
+                temperature=0.1,
+            ),
         ),
         name=config["name"],
         description=config["description"],
         instruction=config["instruction"],
         tools=tools if config["use_tools"] else [],
+        output_key=config["output_key"],
     )
     logger.info(f"Agent {agent.name} created successfully.")
     return agent
 
 
 async def get_manager_agent(config: dict, tools: list):
-    # Only pass tools to agents that need them
     crawler_agent = await get_specialist_agent(config["crawler_agent"], tools)
-    address_agent = await get_specialist_agent(
-        config["address_agent"], []
-    )  # No tools needed
+    address_agent = await get_specialist_agent(config["address_agent"], [])
     geocoding_agent = await get_specialist_agent(config["geocoding_agent"], tools)
-
     manager_agent = Agent(
         model=LiteLlm(
             model=MODEL,
             api_key=os.getenv("GOOGLE_API_KEY"),
-            temperature=0.1,  # More deterministic output
+            generate_content_config=types.GenerateContentConfig(
+                temperature=0.1,
+            ),
         ),
         name="manager_agent",
         description=config["manager_agent"]["description"],
@@ -81,6 +83,18 @@ async def get_manager_agent(config: dict, tools: list):
     return manager_agent
 
 
+async def get_sequential_agent(config: dict, tools: list):
+    crawler_agent = await get_specialist_agent(config["crawler_agent"], tools)
+    address_agent = await get_specialist_agent(config["address_agent"], [])
+    geocoding_agent = await get_specialist_agent(config["geocoding_agent"], tools)
+    agent = SequentialAgent(
+        name=config["sequential_agent"]["name"],
+        sub_agents=[crawler_agent, address_agent, geocoding_agent],
+    )
+    logger.info(f"Sequential agent {agent.name} created successfully.")
+    return agent
+
+
 async def call_agent_async(query: str, user_id: str, session_id: str, runner: Runner):
     content = types.Content(role="user", parts=[types.Part(text=query)])
     final_response_text = None
@@ -88,7 +102,7 @@ async def call_agent_async(query: str, user_id: str, session_id: str, runner: Ru
         user_id=user_id, session_id=session_id, new_message=content
     ):
         logger.info(
-            f"[Event] Author: {event.author}, Type: {type(event).__name__}, Content: {event.content}"
+            f"[Event] Author: {event.author}, Type: {type(event).__name__}, Content: {event.content}, "
         )
         if event.is_final_response():
             if event.content and event.content.parts:
@@ -98,10 +112,8 @@ async def call_agent_async(query: str, user_id: str, session_id: str, runner: Ru
                     f"Agent escalated: {event.error_message or 'No specific message.'}"
                 )
             break
-
     if final_response_text is None:
         raise RuntimeError("No final response received from the agent")
-
     return final_response_text
 
 
@@ -135,18 +147,14 @@ async def main(config: dict, query: str, user_id: str, session_id: str):
 
 
 if __name__ == "__main__":
-    try:
-        with open("src/agents/config.yaml", "r") as f:
-            config = yaml.safe_load(f)
-    except FileNotFoundError:
-        raise FileNotFoundError("Config file not found at src/agents/config.yaml")
-    except yaml.YAMLError as e:
-        raise ValueError(f"Invalid YAML in config file: {str(e)}")
+    with open("src/agents/config.yaml", "r") as f:
+        config = yaml.safe_load(f)
     user_id = str(uuid.uuid4())
     session_id = str(uuid.uuid4())
     load_dotenv(".env")
     os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "False"
-    query = config["query"]
+    # query = config["query"]
+    query = "Can you process this url: {{query_url}}?"
     query_url = "https://tattvammedia.com/blog/list-of-google-offices-in-india/"
     query = query.replace("{{query_url}}", query_url)
     asyncio.run(main(config, query, user_id, session_id))

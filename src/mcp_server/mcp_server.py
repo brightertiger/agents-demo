@@ -1,5 +1,6 @@
 import requests
 import json
+from json_repair import repair_json
 from bs4 import BeautifulSoup
 from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel, Field
@@ -22,35 +23,58 @@ def crawl_to_markdown(url: str) -> str:
     lines = (line.strip() for line in text.splitlines())
     chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
     text = "\n".join(chunk for chunk in chunks if chunk)
-    return text
+    return {"page_content": text}
 
 
 @mcp.tool(
     name="geocode_address",
     description="Convert an address to geographic coordinates using OpenStreetMap",
 )
-def geocode_address(address: dict) -> dict:
+def geocode_address(addresses: dict | str) -> dict:
     """Convert an address to geographic coordinates"""
-    endpoint = "https://nominatim.openstreetmap.org/search"
-    if isinstance(address, str):
-        address = json.loads(address)
-    address_string = f"{address.get('address', '')}, "
-    address_string += f"{address.get('city', '')}, "
-    address_string += f"{address.get('state', '')}, "
-    address_string += f"{address.get('zip', '')}, "
-    address_string += f"{address.get('country', '')}"
-    params = {"q": address_string, "format": "json", "limit": 1}
-    headers = {"User-Agent": "MCP-GeocodingService/1.0"}  # Required by Nominatim
-    response = requests.get(endpoint, params=params, headers=headers)
-    response.raise_for_status()
-    data = response.json()
-    if not data:
-        return {"latitude": 0.0, "longitude": 0.0}
-    result = data[0]
-    return {
-        "latitude": float(result["lat"]),
-        "longitude": float(result["lon"]),
+    if not isinstance(addresses, str):
+        addresses = str(addresses)
+    addresses = repair_json(addresses)
+    addresses = json.loads(addresses)
+    default = {
+        "geocoded_locations": [
+            x | {"latitude": 0.0, "longitude": 0.0}
+            for x in addresses.get("addresses", [])
+        ]
     }
+    try:
+        output = []
+        for address_object in addresses.get("addresses", []):
+            output_ = {}
+            address_string = f"{address_object.get('address', '')}, "
+            address_string += f"{address_object.get('city', '')}, "
+            address_string += f"{address_object.get('state', '')}, "
+            address_string += f"{address_object.get('zip', '')}, "
+            address_string += f"{address_object.get('country', '')}"
+            output_ = {
+                "address": address_object.get("address", ""),
+                "city": address_object.get("city", ""),
+                "state": address_object.get("state", ""),
+                "zip": address_object.get("zip", ""),
+                "country": address_object.get("country", ""),
+            }
+            endpoint = "https://nominatim.openstreetmap.org/search"
+            params = {"q": address_string, "format": "json", "limit": 1}
+            headers = {"User-Agent": "MCP-GeocodingService/1.0"}
+            response = requests.get(endpoint, params=params, headers=headers)
+            response.raise_for_status()
+            data = response.json()
+            if not data:
+                output_["latitude"] = 0.0
+                output_["longitude"] = 0.0
+            else:
+                result = data[0]
+                output_["latitude"] = str(result["lat"])
+                output_["longitude"] = str(result["lon"])
+            output.append(output_)
+        return output
+    except Exception as e:
+        return default
 
 
 if __name__ == "__main__":
