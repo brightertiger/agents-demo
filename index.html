@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agents Demo - Multi-Agent System for Web Information Extraction</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+        }
+
+        .card-hover {
+            transition: transform 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Hero Section -->
+    <header class="gradient-bg text-white">
+        <div class="container mx-auto px-6 py-16">
+            <div class="flex flex-col items-center">
+                <h1 class="text-4xl md:text-6xl font-bold text-center mb-6">Agents Demo</h1>
+                <p class="text-xl md:text-2xl text-center max-w-3xl">
+                    A multi-agent system demonstrating AI agents working together to extract and process
+                    information from web pages. Developed using Google ADK and MCP Platform.
+                </p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Overview Section -->
+    <section class="py-16">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-12">Project Overview</h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-white rounded-lg shadow-lg p-6 card-hover">
+                    <h3 class="text-xl font-semibold mb-4">What It Does</h3>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li>Crawls web pages and extracts their content</li>
+                        <li>Identifies and parses addresses from the content</li>
+                        <li>Converts addresses into geographic coordinates</li>
+                        <li>Presents results in a structured format</li>
+                    </ul>
+                </div>
+                <div class="bg-white rounded-lg shadow-lg p-6 card-hover">
+                    <h3 class="text-xl font-semibold mb-4">Key Features</h3>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li>Specialized AI agents working in collaboration</li>
+                        <li>Robust pipeline for information extraction</li>
+                        <li>Parallel processing capabilities</li>
+                        <li>Structured JSON output format</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Agent Architecture Section -->
+    <section class="py-16 bg-gray-100">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-12">Agent Architecture</h2>
+            <div class="grid md:grid-cols-4 gap-6">
+                <div class="bg-white rounded-lg shadow-lg p-6 text-center card-hover">
+                    <h3 class="text-xl font-semibold mb-4">Crawler Agent</h3>
+                    <p>Fetches and cleans webpage content using BeautifulSoup4</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-lg p-6 text-center card-hover">
+                    <h3 class="text-xl font-semibold mb-4">Address Agent</h3>
+                    <p>Identifies and extracts structured address information</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-lg p-6 text-center card-hover">
+                    <h3 class="text-xl font-semibold mb-4">Geocoding Agent</h3>
+                    <p>Converts addresses into precise geographic coordinates</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-lg p-6 text-center card-hover">
+                    <h3 class="text-xl font-semibold mb-4">Manager Agent</h3>
+                    <p>Orchestrates the workflow between all agents</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Screenshots Section -->
+    <section class="py-16">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-12">System in Action</h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <img src="assets/agent_output.png" alt="Agent Output" class="w-full">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-2">Agent Output</h3>
+                        <p>Example of structured address extraction and processing</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <img src="assets/mcp_server.png" alt="MCP Server" class="w-full">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-2">MCP Server</h3>
+                        <p>Multi-Component Platform server implementation</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Stack Section -->
+    <section class="py-16 bg-gray-100">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-12">Technical Stack</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-lg shadow-lg p-6 text-center card-hover">
+                    <h3 class="text-xl font-semibold mb-4">Core Technologies</h3>
+                    <ul class="space-y-2">
+                        <li>Python 3.12+</li>
+                        <li>Google ADK</li>
+                        <li>MCP Platform</li>
+                        <li>BeautifulSoup4</li>
+                    </ul>
+                </div>
+                <div class="bg-white rounded-lg shadow-lg p-6 text-center card-hover">
+                    <h3 class="text-xl font-semibold mb-4">Development Tools</h3>
+                    <ul class="space-y-2">
+                        <li>Poetry</li>
+                        <li>LiteLLM</li>
+                        <li>JSON Repair</li>
+                        <li>Git</li>
+                    </ul>
+                </div>
+                <div class="bg-white rounded-lg shadow-lg p-6 text-center card-hover">
+                    <h3 class="text-xl font-semibold mb-4">Features</h3>
+                    <ul class="space-y-2">
+                        <li>Parallel Processing</li>
+                        <li>Error Handling</li>
+                        <li>Result Caching</li>
+                        <li>Structured Output</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="gradient-bg text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2024 Agents Demo. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+
+</html>
