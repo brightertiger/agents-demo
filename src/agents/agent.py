@@ -153,8 +153,7 @@ if __name__ == "__main__":
     session_id = str(uuid.uuid4())
     load_dotenv(".env")
     os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "False"
-    # query = config["query"]
-    query = "Can you process this url: {{query_url}}?"
+    query = config["query"]
     query_url = "https://tattvammedia.com/blog/list-of-google-offices-in-india/"
     query = query.replace("{{query_url}}", query_url)
     asyncio.run(main(config, query, user_id, session_id))
